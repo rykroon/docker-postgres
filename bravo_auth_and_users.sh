@@ -7,7 +7,7 @@ sql() {
 #re-create the database from the new template
 sql "DROP DATABASE IF EXISTS postgres;"
 sql "DROP DATABASE IF EXISTS $POSTGRES_DB;"
-sql "CREATE DATABASE $POSTGRES_DB WITH OWNER adminuser;"
+sql "CREATE DATABASE $POSTGRES_DB;"
 
 
 
