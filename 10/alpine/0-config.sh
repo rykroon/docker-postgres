@@ -27,6 +27,7 @@ sql "GRANT ALL ON SCHEMA public TO adminuser;"
 # Grant SELECT, INSERT, UPDATE, DELETE (CRUD) privileges to the cruduser role
 sql "GRANT USAGE ON SCHEMA public TO cruduser;"
 sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO cruduser;"
+sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT USAGE ON SEQUENCES TO cruduser;"
 
 
 # Grant SELECT (read) privileges to the readuser role
