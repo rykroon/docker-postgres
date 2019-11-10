@@ -16,6 +16,7 @@ sql "REVOKE ALL ON SCHEMA public FROM PUBLIC;"
 # Create roles
 sql "CREATE ROLE adminuser CREATEDB CREATEROLE;"
 sql "CREATE ROLE cruduser;"
+sql "CREATE ROLE rwuser;"
 sql "CREATE ROLE readuser;"
 
 
@@ -27,6 +28,12 @@ sql "GRANT ALL ON SCHEMA public TO adminuser;"
 # Grant SELECT, INSERT, UPDATE, DELETE (CRUD) privileges to the cruduser role
 sql "GRANT USAGE ON SCHEMA public TO cruduser;"
 sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO cruduser;"
+sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT USAGE ON SEQUENCES TO cruduser;"
+
+
+# Grant SELECT, INSERT, UPDATE (Read + Write) privileges to the rwuser role
+sql "GRANT USAGE ON SCHEMA public TO rwuser;"
+sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO cruduser;"
 sql "ALTER DEFAULT PRIVILEGES FOR ROLE adminuser IN SCHEMA public GRANT USAGE ON SEQUENCES TO cruduser;"
 
 
@@ -69,9 +76,7 @@ then
 		export PG_ADMIN_PASSWORD=$PG_ADMIN_USER
 	fi
 
-	echo "create $PG_ADMIN_USER"
 	sql "CREATE ROLE $PG_ADMIN_USER LOGIN NOINHERIT ENCRYPTED PASSWORD '$PG_ADMIN_PASSWORD';"
-	echo "GRANT privs"
 	sql "GRANT adminuser TO $PG_ADMIN_USER;"
 fi
 
@@ -87,6 +92,20 @@ then
 
 	sql "CREATE ROLE $PG_CRUD_USER LOGIN ENCRYPTED PASSWORD '$PG_CRUD_PASSWORD';"
 	sql "GRANT cruduser TO $PG_CRUD_USER;"
+fi
+
+
+#Create crud user if applicable
+if [ "$PG_RW_USER" != "" ]
+then
+	#Set default password to username
+	if [ "$PG_RW_PASSWORD" == "" ]
+	then
+		export PG_RW_PASSWORD=$PG_RW_USER
+	fi
+
+	sql "CREATE ROLE $PG_RW_USER LOGIN ENCRYPTED PASSWORD '$PG_RW_PASSWORD';"
+	sql "GRANT cruduser TO $PG_RW_USER;"
 fi
 
 
